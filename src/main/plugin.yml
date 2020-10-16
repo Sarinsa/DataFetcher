@@ -1,0 +1,6 @@
+name: DataFetcher
+version: 0.1
+description: "Fetches various data from the server and parses it to our Discord bot."
+api-version: 1.16.3
+author: Sarinsa
+main: com.sarinsa.DataFetcher
