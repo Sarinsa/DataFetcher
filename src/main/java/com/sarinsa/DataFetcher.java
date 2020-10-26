@@ -10,24 +10,28 @@ public class DataFetcher extends JavaPlugin {
 
     public static DataFetcher instance;
     private FileConfiguration CONFIG;
-    private JsonWriter<DataPacket> jsonWriter = new JsonWriter<>(DataPacket.class);
-
-    private FetchRunnable task = new FetchRunnable();
+    private JsonWriter<DataHolder> jsonWriter;
+    private FetchRunnable task;
     // 2 minutes of server ticks.
     private final long defaultTaskDelay = 20 * 60 * 2;
 
-    public DataFetcher() {
-        instance = this;
-    }
 
     @Override
     public void onEnable() {
+        instance = this;
+
         createDir();
         createConfig();
 
-        CONFIG = getConfiguraion();
+        this.getCommand("dfreload").setExecutor(new ConfigReloadExecutor());
 
-        task.runTaskLater(this, CONFIG.getLong("task-delay"));
+        this.jsonWriter = new JsonWriter<>(DataHolder.class);
+        this.task = new FetchRunnable(jsonWriter);
+
+        reloadConfig();
+
+        long period = CONFIG.getLong("task-period");
+        task.runTaskTimer(this, 0, period);
     }
 
     private void createDir() {
@@ -44,14 +48,18 @@ public class DataFetcher extends JavaPlugin {
 
     private void createConfig() {
         try {
-            File main = new File(getDataFolder(), "cfg.yml");
+            File file = new File(getDataFolder(), "config.yml");
 
-            if (!main.exists()) {
+            if (!file.exists()) {
                 getLogger().info("Creating plugin configuration...");
 
-                CONFIG = YamlConfiguration.loadConfiguration(main);
-                CONFIG.set("task-delay", defaultTaskDelay);
-                CONFIG.save(main);
+                CONFIG = YamlConfiguration.loadConfiguration(file);
+                // Default values
+                CONFIG.set("task-period", defaultTaskDelay);
+                CONFIG.set("jsonbin-url", "");
+                CONFIG.set("jsonbin-key", "");
+
+                CONFIG.save(file);
             }
         } catch (Exception e) {
             getLogger().severe("Failed to create config file! This ain't good, chief!");
@@ -60,7 +68,12 @@ public class DataFetcher extends JavaPlugin {
     }
 
     public FileConfiguration getConfiguraion() {
-        File config = new File(getDataFolder(), "cfg.yml");
-        return YamlConfiguration.loadConfiguration(config);
+        return this.CONFIG;
+    }
+
+    @Override
+    public void reloadConfig() {
+        File config = new File(getDataFolder(), "config.yml");
+        this.CONFIG = YamlConfiguration.loadConfiguration(config);
     }
 }

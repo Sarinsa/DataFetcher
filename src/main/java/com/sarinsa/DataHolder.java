@@ -2,16 +2,12 @@ package com.sarinsa;
 
 import org.bukkit.Bukkit;
 
-public class DataPacket {
+public class DataHolder {
 
     private int onlinePlayers = 0;
     private int tps = 0;
 
-    public void updateTps() {
-
-    }
-
-    public void updateOnlinePlayers() {
+    public void update() {
         this.onlinePlayers = Bukkit.getServer().getOnlinePlayers().size();
     }
 

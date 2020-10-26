@@ -1,0 +1,15 @@
+name: DataFetcher
+version: 0.1
+description: "Fetches various data from the server to be used by our Discord bot"
+api-version: 1.16
+author: Sarinsa
+main: com.sarinsa.DataFetcher
+
+commands:
+  dfreload:
+    description: Reloads the plugin configuration
+    usage: "&cToo many arguments! Usage: /dfreload"
+    permission: datafetcher.admin
+    permission-message: "&cYou don't have permission to perform this command"
+
+
